@@ -1,0 +1,82 @@
+import re
+import jieba
+import jieba.analyse
+import operator
+from operator import itemgetter, attrgetter
+
+# 我們要的分類
+words = input()
+tso_jian = []
+su_u = []
+su_shi = []
+bian_don = []
+tao_luin = []
+bike = []
+S_card = []
+activity = []
+shop = []
+teach = []
+S_house = []
+we_want_analyse_0 = [words]# 我們想要分類的文章，先裝在list 裡
+we_want_analyse = [[0 for i in range(2)]for j in range(len(we_want_analyse_0))] # 要將文章跟網址分開
+print(we_want_analyse)
+
+# 如果要一開始把網址分開
+def Find(string):
+    # findall() 搜尋匹配正規表達式的字串
+    url = re.findall('https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+', string)
+    return url
+def remove_urls (vTEXT):
+    vTEXT = re.sub(r'(https|http)?:\/\/(\w|\.|\/|\?|\=|\&|\%)*\b', '', vTEXT, flags=re.MULTILINE)
+    return(vTEXT)
+
+
+for i in range(len(we_want_analyse_0)):
+    wao_zu = Find(we_want_analyse_0[i])
+    wen = remove_urls(we_want_analyse_0[i])
+    we_want_analyse[i][0] = wen
+    we_want_analyse[i][1] = wao_zu   
+print(we_want_analyse)    
+for r in range(len(we_want_analyse)):
+    # 結巴斷詞 
+    jieba.set_dictionary("dict.txt")
+    type_word = 0
+    words_2 = jieba.cut(we_want_analyse[r][0], cut_all=False)
+    the_one = []
+    for k in words_2:
+        the_one.append(k)    
+    # 莊每一次斷詞後的結果
+    h = True
+    if "抽獎" in the_one or "抽" in the_one:
+        tso_jian.append(we_want_analyse[r])
+        h = False
+    if "遺失" in the_one or "撿" in the_one:
+        h = False
+        if "學生證" in the_one:
+            S_card.append(we_want_analyse[r])
+        else:
+            su_u.append(we_want_analyse[r])
+    if "便當" in the_one:
+        h = False
+        bian_don.append(we_want_analyse[r])
+    if "團購" in the_one:
+        h = False
+        shop.append(we_want_analyse[r])
+    if "週" in the_one or "講座" in the_one or "社團" in the_one:
+        h = False
+        activity.append(we_want_analyse[r])
+    if "討論" in the_one or "請益" in the_one:
+        h = False
+        tao_luin.append(we_want_analyse[r])
+    if "實習" in the_one:
+        su_shi.append(we_want_analyse[r])
+        h = False
+    if "家教" in the_one:
+        teach.append(we_want_analyse[r])
+    if "腳踏車" in the_one:
+        if h:
+            bike.append(we_want_analyse[r])
+    if "宿舍" in the_one:
+        if h:
+            S_house.append(we_want_analyse[r])
+print(the_one)
